@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>商户首页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-form-select {
+            width: 150px;
+        }
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<h1>首页</h1>
+
+
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md20">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>个人信息</legend>
+                    </fieldset>
+                </div>
+                <div class="layui-card-body">
+                    <div class="layui-form">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="150">
+                                <col width="150">
+                                <col width="200">
+                                <col>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>登录账号</th>
+                                <th>收卡账号</th>
+                                <th>代充账号</th>
+                                <th>我的邀请码</th>
+                                <th>奖励比例</th>
+                                <th>可提现金额</th>
+                            </tr>
+                            </thead>
+                            <tbody id="info">
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div class="layui-card-body">
+                    <div class="layui-form">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="100">
+                                <col width="400">
+                                <col>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th>邀请链接</th>
+                                <td>
+                                    <div class="layui-form-item" id="codediv">
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs10">
+                                                <div style="background-color:#EEEEEE ; border-style: solid;border-width: 1px;border-color:#C9C9C9; height:37px;line-height: 37px;text-indent: 20px;border-right: none; ">
+                                                    <span id="invite_linkcopy"> </span></div>
+
+                                            </div>
+                                            <div class="layui-col-xs1">
+                                                <div>
+
+                                                    <button type="button"
+                                                            class="layui-btn layui-btn-primary layui-btn-fluid"
+                                                            style="background-color:#F6F6F6 ;"
+                                                            idata-clipboard-action="copy"
+                                                            data-clipboard-target="#invite_linkcopy" id="copy_btn">复制
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>邀请二维码</th>
+                                <td><img id="invite_qr_code" src=""></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="layui-card-header">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>近期概况</legend>
+                    </fieldset>
+                    展示近七天
+                </div>
+                <div class="layui-card-body">
+                    <div class="layui-form">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="150">
+                                <col width="150">
+                                <col width="200">
+                                <col>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>收货金额</th>
+                                <th>代充金额</th>
+                                <th>收货奖励</th>
+                                <th>邀请奖励</th>
+                                <th>代充奖励</th>
+                                <th>奖励汇总</th>
+                                <th>状态</th>
+                            </tr>
+                            </thead>
+                            <tbody id="jqgk">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="js/clipboard.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+
+<script>
+    layui.use(['layer', 'form'], function () {
+        var layer = layui.layer
+            , form = layui.form;
+    });
+    //数据初始化
+    var result = sendRequest("get", "/businessman/homepage/", {});
+    var deposit_back_rate = result.data.recycle_businessman_data.deposit_back_rate*100;
+     var recycle_back_rate = result.data.recycle_businessman_data.recycle_back_rate*100;
+     var invite_back_rate = result.data.recycle_businessman_data.invite_back_rate*100;
+    if (result.code === 0) {
+        var info = "<tr><td>" + result.data.recycle_businessman_data.username + "</td>"
+            + "<td>" + result.data.recycle_businessman_data.phone + "</td>"
+            + "<td>" + result.data.recycle_businessman_data.dh_phone + "</td>"
+            + "<td>" + result.data.recycle_businessman_data.invite_code + "</td>"
+            + "<td>收货奖励：" + recycle_back_rate + "%<br/>代充奖励："+deposit_back_rate+"%<br/>邀请奖励："+invite_back_rate+"%</td>"
+            + "<td>" + result.data.recycle_businessman_data.balance + "</td>"
+            + "</tr>";
+        $("#info").html(info);
+
+        var element = document.getElementById('invite_qr_code');
+        element.src = getimgurl() + result.data.recycle_businessman_data.invite_qr_code;
+        $("#invite_linkcopy").html(result.data.recycle_businessman_data.invite_link);
+        var jqgk = result.data.jqgk;
+        var jqgkHtml = "";
+        for (var i = 0; i < jqgk.length; i++) {
+        	var total = parseFloat(jqgk[i].receive_back_profit_cny)+parseFloat(jqgk[i].ls_back_profit_cny)+ parseFloat(jqgk[i].dai_chong_back_profit_cny);
+            jqgkHtml += "<tr><td>" + jqgk[i].data_date + "</td>"
+                + "<td>" + jqgk[i].receive_cny + "</td>"
+                + "<td>" + jqgk[i].dai_chong_cny + "</td>"
+                + "<td>" + jqgk[i].receive_back_profit_cny + "</td>"
+                + "<td>" + jqgk[i].ls_back_profit_cny + "</td>"
+                + "<td>" + jqgk[i].dai_chong_back_profit_cny + "</td>"
+                + "<td>" + total + "</td>";
+            var statu = "";
+            if (jqgk[i].status == 1) {
+                statu = "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#5FB878;'>已结算</button>";
+            } else if (jqgk[i].status == 2) {
+                statu = "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#C85655;'>未结算</button>";
+            }
+            jqgkHtml += "<td>" + statu + "</td>"
+                + "</tr>";
+        }
+        $("#jqgk").html(jqgkHtml);
+
+    }
+    //复制邀请链接
+    var clipboard = new Clipboard('#copy_btn');
+    clipboard.on('success', function (e) {
+        layer.msg('复制成功！', {icon: 1});
+        e.clearSelection();
+        console.log(e.clearSelection);
+    });
+</script>
+
+</body>
+
+</html>

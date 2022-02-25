@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>卡密库存信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-form-select {
+            width: 150px;
+        }
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <button class="layui-btn layui-btn-normal" data-type="importcard">导入卡密</button>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" lay-size="sm">
+                <thead>
+                <tr>
+                    <th rowspan="2" lay-data="{align:'center'}">卡密类型</th>
+                    <th rowspan="2" lay-data="{align:'center'}">当前余量</th>
+                    <th rowspan="2" lay-data="{align:'center'}">警告数量</th>
+                    <th rowspan="2" lay-data="{align:'center'}">今日入库量</th>
+                    <th colspan="1" id="ti_ka_volumes" lay-data="{align:'center'}"
+                        style='background-color: #4BB2FF; color: #fff;'>提卡量
+                    </th>
+                </tr>
+                <tr id="date" style='background-color: #4BB2FF; color: #fff;'>
+                </tr>
+                </thead>
+                <tbody id="cardinventoryinfos">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+<script>
+    layui.use('form', function () {
+        var form = layui.form, layer = layui.layer;
+
+
+        var $ = layui.$,
+            active = {
+                importcard: function () {
+                    layer.open({
+                        type: 2,
+                        title: "导入卡密",
+                        skin: 'layui-layer-rim', //加上边框
+                        shadeClose: true,
+                        maxmin: true, //开启最大化最小化按钮
+                        area: ['400px', '400px'], //宽高
+                        content: "importcard.html",  //调到新增页面
+                        end: function () {
+                            window.location.reload();
+                        }
+                    });
+
+                }
+            };
+
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+    var result = sendRequest("get", "/inventory/cardinventoryinfo/", {});
+    if (result.code === 0 && result.data[0] != null) {
+        var dateData = result.data[0].ti_ka_volumes;
+        var cardinventoryinfos = result.data;
+        document.getElementById("ti_ka_volumes").colSpan = dateData.length + "";
+        var datehmtl = "";
+        var cardinventoryinfosHtml = "";
+        for (var i = 0; i < dateData.length; i++) {
+            datehmtl += "<th>" + dateData[i][0] + "</th>";
+        }
+        $("#date").html(datehmtl);
+        for (var i = 0; i < cardinventoryinfos.length; i++) {
+            cardinventoryinfosHtml += "<tr>"
+                + "<td>" + cardinventoryinfos[i].name + "</td>"
+                 + "<td>" + cardinventoryinfos[i].cur_residue + "</td>"
+                + "<td>" + cardinventoryinfos[i].warning_volumes + "</td>"
+                + " <td>" + cardinventoryinfos[i].today_warehousing_volumes + "</td>";
+            for (var j = 0; j < cardinventoryinfos[i].ti_ka_volumes.length; j++) {
+                cardinventoryinfosHtml += "<td style='background-color: #4BB2FF; color: #fff;'>" + cardinventoryinfos[i].ti_ka_volumes[j][1] + "</td>";
+            }
+
+            cardinventoryinfosHtml += "</tr>";
+        }
+        $("#cardinventoryinfos").html(cardinventoryinfosHtml);
+    }
+
+</script>
+
+</body>
+</html>

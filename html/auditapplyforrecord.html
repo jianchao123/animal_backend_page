@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>比特币赠送审核</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+
+</head>
+<body>
+<form class="layui-form layui-form-pane" action="" lay-filter="productType">
+
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">是否通过</label>
+        <div class="layui-input-block" id="is_pass">
+            <input type="radio" name="is_pass"  value="1" title="通过" checked="">
+            <input type="radio" name="is_pass"  value="0" title="拒绝">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入备注" id="remark" name="remark" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="demo2" id="opt">添加</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+<script>
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]);
+        return null; //返回参数值
+    }
+
+    var type = getUrlParam('type');
+    var result = sendRequest("get", "/settings/paytypes/", {});
+
+    var resultData = result.data;
+    var htmls = "";
+    for (var i = 0; i < resultData.length; i++) {
+        htmls += '<option value = "' + resultData[i].pk + '">' + resultData[i].pay_name + '</option>';
+    }
+    $("#pay_type").html(htmls);
+
+
+    layui.use(['form'], function () {
+        var form = layui.form
+            , layer = layui.layer;
+
+        //监听提交
+        form.on('submit(demo2)', function (data) {
+            if (type == 0) {
+                var auditapplyforrecord = sessionStorage.getItem("auditapplyforrecord");
+                var data = JSON.parse(auditapplyforrecord);
+                var withdraw_record_pk = data.pk;
+                var is_pass = parseInt($('#is_pass input[name="is_pass"]:checked').val());
+                var remark = $("#remark").val();
+                var param = {withdraw_record_pk: withdraw_record_pk, is_pass: is_pass, remark: remark};
+                var result = sendRequest("post", "/businessman/auditapplyforrecord/", JSON.stringify(param));
+                 if(result.code === 0){
+        				layer.msg('操作成功！', {icon: 1,time:1000},function(){
+		                    window.parent.location.reload();
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.close(index); //关闭弹层的窗口
+						});
+        			}
+            } else if (type == 1) {
+
+            }
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>

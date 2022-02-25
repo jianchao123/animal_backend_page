@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>中奖订单</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-form-select {
+            width: 150px;
+        }
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" id="userlistTable">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户UID</label>
+                <div class="layui-input-block">
+                    <input class="layui-input" name="uid" id="uid" autocomplete="off" placeholder="用户UID">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">用户手机号</label>
+                <div class="layui-input-block">
+                    <input class="layui-input" name="phone" id="phone" autocomplete="off" placeholder="用户手机号">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">周期号</label>
+                <div class="layui-input-block">
+                    <input class="layui-input" name="period_no" id="period_no" autocomplete="off" placeholder="周期号">
+                </div>
+            </div>
+            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="reload"><i
+                    class="layui-icon">&#xe615;</i>查询
+            </button>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="userlist" lay-filter="demo">
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+
+<script type="text/html" id="productInfo">
+    <span style="color: #34C0E3">
+		    {{d.commodity_name}}
+		</span>
+    <br/>
+    <span>
+        [类别]{{d.commodity_type}}
+        </span>
+    <br/>
+    <span>
+            [进货渠道]{{d.commodity_buy_channel}}
+            </span>
+</script>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+    var result = sendRequest("get", "/settings/paytypes/", {});
+    var resultData = result.data;
+    var htmls = "<option value='-1'>全部支付类型</option>";
+
+
+    for (var i = 0; i < resultData.length; i++) {
+        htmls += '<option value = "' + resultData[i].pk + '">' + resultData[i].pay_name + '</option>';
+    }
+    $("#pay_type_pk").html(htmls);
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.render({ //其它参数在此省略
+            elem: '#userlist',
+            method: "get",
+            url: geturl() + "/snatchtreasure/winprizeorder/",
+            page: true,
+            cols: [
+                [{
+                    field: 'pk',
+                    title: 'GID',
+                    width: 100
+                }, {
+                    field: 'period_index',
+                    title: '期数',
+                    width: 100
+                }, {
+                    field: 'commodity_name',
+                    title: '商品名称',
+                    width: 200,
+                    templet: '#productInfo'
+                }, {
+                    field: 'period_no',
+                    title: '周期号',
+                    width: 100
+                }, {
+                    field: 'snatch_treasure_amounts',
+                    title: '夺宝价',
+                    width: 100
+                }, {
+                    field: 'buy_renci',
+                    title: '购买次数',
+                    width: 100
+
+                }, {
+                    field: 'luck_token',
+                    title: '幸运号码',
+                    width: 100
+
+                }, {
+                    field: 'reward_time',
+                    title: '开奖时间',
+                    width: 160
+                }, {
+                    field: 'nickname',
+                    title: '用户昵称',
+                    width: 120,
+                    templet: function (d) {
+                        return "<sapn style='color: #34C0E3'>" + d.nickname + "</span>";
+                    }
+                }, {
+                    field: 'phone',
+                    title: '用户手机号',
+                    width: 160
+                }, {
+                    field: 'status',
+                    title: '订单状态',
+                    templet: function (d) {
+                        var statustr = "";
+                        if (d.period_status === '已结束') {
+                            statustr += "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#F7AE2D;'>" + d.period_status + "</button>";
+                        } else {
+                            statustr += "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#30BFE9;'>" + d.period_status + "</button>";
+                        }
+                        if (d.is_accept_prize === '已领奖') {
+                            statustr += "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#C85655;'>" + d.is_accept_prize + "</button>";
+                        } else {
+                            statustr += "<button class='layui-btn layui-btn layui-btn-sm' style='background-color:#5FB878;'>" + d.is_accept_prize + "</button>";
+                        }
+
+                        return statustr;
+                    },
+                    width: 200
+                }
+
+                ]
+            ],
+            height: 'full-100',
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.detail, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.results //解析数据列表
+                };
+            },
+            id: 'userlistReload'
+
+        });
+
+        var $ = layui.$,
+            active = {
+                reload: function () {
+                    var uid = $('#uid').val();
+                    var phone = $('#phone').val();
+                    var period_no = $('#period_no').val();
+
+                    //执行重载
+                    table.reload('userlistReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                            uid: uid,
+                            phone: phone,
+                            period_no: period_no
+                        }
+                    });
+                }
+            };
+
+        $('#userlistTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>代理记录列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-card">
+<div class="layui-form layui-form-pane" style="margin-left: 20px;padding-top: 15px;" id="agency" lay-filter="productType">
+    <input type="hidden" id="id">
+    <!--<div class="layui-form-item">
+        <label class="layui-form-label">卡商</label>
+        <div class="layui-input-inline">
+            <select id="to_recycle_businessman" name="to_recycle_businessman" lay-verify="">
+            </select>
+        </div>
+    </div>
+    -->
+     <div class="layui-form-item">
+      <label class="layui-form-label">搜索框</label>
+      <div class="layui-input-inline">
+        <select name="modules" lay-verify="required" lay-search="" id="to_recycle_businessman" >
+          
+        </select>
+      </div>
+    </div>
+
+    
+    <div class="layui-form-item">
+        <label class="layui-form-label">金额</label>
+        <div class="layui-input-inline">
+            <input type="text" id="amounts" name="amounts" lay-verify="required" placeholder="请输入金额" autocomplete="off"
+                   class="layui-input"
+                   onblur="if (!/^\d+(\.\d+)?$/.test(this.value)){this.value='0.0000';}  $(this).val(parseFloat($(this).val()).toFixed(4));"
+                   step="0.0000">
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入备注" lay-verify="required" id="remark" name="remark"
+                      class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-inline">
+            <button class="layui-btn"  lay-submit lay-filter="demo2" id="opt">提交
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <div class="layui-card-body" id="agencylist">
+        <table class="layui-table" id="productlist" lay-filter="product">
+
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+<script>
+
+
+    var table;
+
+    layui.use('form', function () {
+        var form = layui.form, layer = layui.layer;
+
+        //监听提交
+        form.on('submit(demo2)', function (data) {
+            var amounts = $("#amounts").val();
+            var remark = $("#remark").val();
+            var to_recycle_businessman = $("#to_recycle_businessman").val();
+            var param = {amounts: amounts, remark: remark, to_recycle_businessman: to_recycle_businessman};
+            var result = sendRequest("POST", "/businessman/agencyrecordlist/", JSON.stringify(param));//JSON.stringify(data.field)
+            if (result.code === 0) {
+                //执行重载
+                table.reload('userlistReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                layer.msg('操作成功！', {icon: 1, time: 1000});
+            } else {
+                layer.msg('操作失败！', {icon: 5, time: 1000});
+            }
+            return false;
+        });
+
+    });
+    var result = sendRequest("get", "/businessman/recyclebusinessmanlist/", {page:1,limit:1000});
+    var resultData = result.data.results;
+    var htmls = "";
+    for (var i = 0; i < resultData.length; i++) {
+        htmls += '<option value = "' + resultData[i].pk + '">' + resultData[i].nickname + '</option>';
+    }
+    $("#to_recycle_businessman").html(htmls);
+
+
+
+        layui.use('table', function () {
+            table = layui.table;
+            table.render({ //其它参数在此省略
+                elem: '#productlist',
+                method: "get",
+                page: true,
+                url: geturl() + "/businessman/agencyrecordlist/",
+                cols: [[ //标题栏
+                    {field: 'pk', title: 'ID', width: 115} //rowspan即纵向跨越的单元格数
+                    , {field: 'agency_trade_no', title: '订单号', align: 'center', width: 200}
+                    , {field: 'amounts', title: '充值金额', align: 'center', width: 150}
+                    , {field: 'remark', title: '备注', align: 'center', width: 200}
+                    , {
+                        field: 'to_recycle_businessman', title: '回收商', align: 'center', width: 200,
+                        templet: function (d) {
+                            for (var i = 0; i < resultData.length; i++) {
+                                if (resultData[i].pk === d.to_recycle_businessman)
+                                    return resultData[i].nickname;
+                            }
+                        }
+                    } , {field: 'phone', title: '收卡号码', align: 'center', width: 110}
+                    , {
+                        field: 'status', title: '状态', width: 98, templet: function (d) {
+                            if (d.status == 1) {
+                                return "<sapn style='color:#30BFE9;'>待定</sapn>";
+                            } else if (d.status == 2) {
+                                return "<sapn style='color:#5FB878;'>充值成功</sapn>";
+                            } else if (d.status == 10) {
+                                return "<sapn>删除</sapn>";
+                            }
+                        }
+                    }
+                    , {field: 'deposit_time', title: '充值时间', align: 'center', width: 170}
+
+                ]],
+                where: {ordering: '-id'}
+                ,parseData: function (res) { //res 即为原始返回的数据
+                    console.log(res);
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.detail, //解析提示文本
+                        "count": res.data.count, //解析数据长度
+                        "data": res.data.results //解析数据列表
+                    };
+                }
+                , id: 'userlistReload'
+
+            });
+            var $ = layui.$, active = {
+                reload: function () {
+                    var userPhone = $('#userPhone').val();
+
+                    //执行重载
+                    table.reload('userlistReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {
+                           ordering: '-id'
+                        }
+                    });
+                }
+            };
+
+            $('#productlistTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+        });
+
+
+
+
+</script>
+
+</body>
+</html>

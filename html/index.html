@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
+    <script>
+        //iframe高度自适应
+        function setIframeHeight(iframe) {
+            if (iframe) {
+                var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+                if (iframeWin.document.body) {
+                    iframe.height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
+                }
+            }
+        };
+    </script>
+</head>
+
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!--头部-->
+    <div class="layui-header">
+        <!--头部左侧导航-->
+        <ul class="layui-nav layui-layout-left" lay-filter="leftmenu" style="margin-left: 2%">
+            <li class="layui-nav-item">
+                <a href="javascript:;" class="hidetab" title="隐藏左侧菜单"><i class="layui-icon layui-icon-shrink-right"></i></a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;refresh();"  title="刷新"><i
+                        class="layui-icon layui-icon-refresh-3"></i></a>
+            </li>
+        </ul>
+        <!--头部右侧导航-->
+        <ul class="layui-nav layui-layout-right" lay-filter="rightmenu" style="margin-right: 14%">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-user"></i>
+                    <span id="nickname"></span>
+                </a>
+                <dl class="layui-nav-child">
+                    <!-- <dd><a href="javascript:;" lay-href="./userinfo.html"><i class="layui-icon layui-icon-form"></i>基本资料</a></dd> -->
+                    <dd id="updatePassword">
+                        <a href="javascript:;" lay-href="./changepassword.html"><i
+                                class="layui-icon layui-icon-password"></i>修改密码</a>
+                    </dd>
+                </dl>
+            </li>
+            <!-- <li class="layui-nav-item">
+                <a href="javascript:;">锁屏<i class="layui-icon layui-icon-password"></i></a>
+            </li> -->
+            <li class="layui-nav-item">
+                <a  onclick="signout()">退出</a>
+            </li>
+        </ul>
+    </div>
+    <!--左侧-->
+    <div class="layui-side layui-side-menu">
+        <!--带滚动条垂直导航-->
+        <div class="layui-side-scroll layui-bg-black">
+            <div class="layui-logo">动物世界</div>
+            <ul class="layui-nav layui-nav-tree" lay-filter="navtree">
+                <!--默认展开-->
+
+                <li class="layui-nav-item"  id="user">
+                    <a href="javascript:;" title="用户管理"><i class="layui-icon layui-icon-user"></i><cite>用户管理</cite></a>
+                    <dl class="layui-nav-child" id="recyclebusinessmanlist">
+                        <dd >
+                            <a href="javascript:;" lay-href="./recyclebusinessmanlist.html">卡商列表</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child" id="userlist">
+                        <dd >
+                            <a href="javascript:;" lay-href="./userlist.html">用户列表</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child" id="userconsumesituation">
+                        <dd >
+                            <a href="javascript:;" lay-href="./userconsumesituation.html">用户批次分析</a>
+                        </dd>
+                    </dl>
+
+                </li>
+                <li class="layui-nav-item"  id="product">
+                    <a href="javascript:;" title="商品管理"><i class="layui-icon layui-icon-app"></i><cite>商品管理</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./productTypelist.html">商品类型</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./buychannelslist.html">购买渠道</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./productlist.html">商品信息</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./cardentryrecords.html">卡密种类</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./cards.html">卡密</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="ad">
+                    <a href="javascript:;" title="广告管理"><i
+                            class="layui-icon layui-icon-website"></i><cite>广告管理</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./bannerlist.html">banner列表</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="console">
+                    <a href="javascript:;" title="自有库存后台"><i
+                            class="layui-icon layui-icon-console"></i><cite>自有库存后台</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./cardinventoryinfo.html">卡密库存信息</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="buy">
+                    <a href="javascript:;" title="购买管理"><i
+                            class="layui-icon layui-icon-cart-simple"></i><cite>购买管理</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./orderlist.html">实时购买</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./depositlist.html">充值列表</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./winprizeorder.html">中奖订单</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"  id="goods">
+                    <a href="javascript:;" title="发货管理"><i class="layui-icon layui-icon-note"></i><cite>发货管理</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./deliverygoodslist.html">实物订单</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./virtualorders.html">虚拟订单</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="system">
+                    <a href="javascript:;" title="系统配置"><i class="layui-icon layui-icon-set"></i><cite>系统配置</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./payTypelist.html">支付类型配置</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./payaccountsconflist.html">支付账号配置</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./paymoneyctlist.html">支付金额配置</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./paychannels.html">支付通道配置</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./commonparamconflist.html">公共参数配置</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="card_li">
+                    <a href="javascript:;" id="cardtitle" title="卡商管理"><i class="layui-icon layui-icon-user"></i><cite id="cardfont">卡商管理</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd id="dcdeposit">
+                            <a href="javascript:;" lay-href="./dcdeposit.html">代充记录</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd id="withdrawlist">
+                            <a href="javascript:;" lay-href="./withdrawlist.html">卡商提现记录</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd id="recyclerecordlist">
+                            <a id="recyclerecordtitle" href="javascript:;" lay-href="./recyclerecordlist.html">卡商收卡记录</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child" id="recyclestatistics">
+                        <dd >
+                            <a href="javascript:;" lay-href="./recyclestatistics.html">卡商收卡统计</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd id="invitationrecordlist">
+                            <a href="javascript:;" lay-href="./invitationrecordlist.html">邀请记录</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child" id="agencyrecordlist">
+                        <dd >
+                            <a href="javascript:;" lay-href="./agencyrecordlist.html">代理记录</a>
+                        </dd>
+                    </dl>
+                </li>
+                 <li class="layui-nav-item" id="other">
+                    <a href="javascript:;" title="工具"><i class="layui-icon layui-icon-util"></i><cite>工具</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./tool.html">工具</a>
+                        </dd>
+                    </dl>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./snatchtreasure.html">指定中奖人</a>
+                        </dd>
+                    </dl>
+                     <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./registrationgift.html">注册赠送</a>
+                        </dd>
+                    </dl>
+                     <dl class="layui-nav-child">
+                         <dd>
+                             <a href="javascript:;" lay-href="./expenseRecord.html">费用记录列表</a>
+                         </dd>
+                     </dl>
+                </li>
+                 <li class="layui-nav-item" id="statistics">
+                    <a href="javascript:;" title="统计"><i class="layui-icon layui-icon-form"></i><cite>统计</cite></a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" lay-href="./finance.html">财务统计</a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--正文-->
+    <div class="layui-body layui-bg-gray">
+        <!--选项卡-->
+        <div class="layui-admin-pagetabs">
+            <div class="layui-tab layui-tab-brief" lay-allowClose="true" lay-filter="pagetabs">
+                <ul class="layui-tab-title layui-bg-white">
+                    <li class="layui-this" lay-id="./home.html"><i class="layui-icon layui-icon-home"></i></li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <iframe id="home" src="./home.html" class="layui-admin-iframe" scrolling="auto" frameborder="0"
+                                style="width:100%;height:600px;"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--底部-->
+<div class="layui-footer">牛逼商城后台管理系统</div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+<script>
+    var account = null;
+   
+    
+ 	var result1 = sendRequest("get", "/user/businessman/info/", {}); 
+ 	console.log(result1);
+ 	if(result1.code===0){
+ 		account = result1.data;
+ 	}
+    $("#nickname").html(account.nickname);
+    if (account.role === '回收商') {
+        document.getElementById("updatePassword").setAttribute("class", "layui-show");
+        // document.getElementById('card_li').style.display='none';
+        document.getElementById("cardtitle").setAttribute("title", "我的管理");
+        $("#cardfont").html("我的管理");
+        $("#recyclerecordtitle").html("收卡记录");
+        document.getElementById("user").setAttribute("class", "layui-hide");
+        document.getElementById("product").setAttribute("class", "layui-hide");
+        document.getElementById("ad").setAttribute("class", "layui-hide");
+        document.getElementById("console").setAttribute("class", "layui-hide");
+        document.getElementById("buy").setAttribute("class", "layui-hide");
+        document.getElementById("goods").setAttribute("class", "layui-hide");
+        document.getElementById("system").setAttribute("class", "layui-hide");
+        document.getElementById("recyclestatistics").setAttribute("class", "layui-nav-child layui-hide");
+        document.getElementById("agencyrecordlist").setAttribute("class", "layui-nav-child layui-hide");
+         document.getElementById("other").setAttribute("class", "layui-hide");
+         document.getElementById("statistics").setAttribute("class", "layui-hide");
+    } else if (account.role === '管理员') {
+        document.getElementById("home").setAttribute("src", "");
+        document.getElementById("updatePassword").setAttribute("class", "layui-hide");
+    }
+
+    function refresh(){
+        var src=$(".layui-tab-item.layui-show").find("iframe").attr("src");
+        $(".layui-tab-item.layui-show").find("iframe").attr("src",src);
+    }
+    //退出
+    function signout(){
+        sendRequest("get", "/user/signout/", {});
+        window.location.href = './login.html';
+    }
+
+    layui.use(['element', 'layer'], function () {
+        var element = layui.element,
+            layer = layui.layer,
+            $ = layui.jquery;
+        //隐藏tab主页关闭标签
+        $(".layui-tab-title li:first-child i:last-child").css("display", "none");
+        //tab点击监控
+        element.on('tab(pagetabs)', function (data) {
+            //tab切换时，左侧菜单对应选中
+            var url = $(this).attr("lay-id");
+            $(".layui-nav-tree li dd").each(function (i, e) {
+                if ($(this).find("a").attr("lay-href") == url) {
+                    $(this).attr("class", "layui-this");
+                } else {
+                    $(this).attr("class", "");
+                }
+            })
+        });
+        //顶部左侧菜单监控
+        element.on('nav(leftmenu)', function (elem) {
+            //隐藏显示侧边菜单
+            if (elem[0].className == "hidetab") { //隐藏
+                //侧边菜单伸缩
+                $(".layui-side-menu").animate({
+                    width: $(".layui-side-menu").width() - 144 + "px"
+                });
+                //正文伸缩
+                $(".layui-body").animate({
+                    left: $(".layui-body").position().left - 144 + "px"
+                });
+                //底部伸缩
+                $(".layui-footer").animate({
+                    left: $(".layui-footer").position().left - 144 + "px"
+                });
+                $(this).attr("class", "showtab");
+                $(this).find("i").attr("class", "layui-icon layui-icon-spread-left");
+                //侧边菜单只显示图标
+                $(".layui-nav-tree").find("li").each(function (em, ind) {
+                    $(this).find("cite").css("display", "none");
+                    $(this).find("dl").css("display", "none");
+                });
+            } else if (elem[0].className == "showtab") { //显示
+                $(".layui-side-menu").animate({
+                    width: $(".layui-side-menu").width() + 144 + "px"
+                });
+                $(".layui-body").animate({
+                    left: $(".layui-body").position().left + 144 + "px"
+                });
+                $(".layui-footer").animate({
+                    left: $(".layui-footer").position().left + 144 + "px"
+                });
+                $(this).attr("class", "hidetab");
+                $(this).find("i").attr("class", "layui-icon layui-icon-shrink-right");
+                $(".layui-nav-tree").find("li").each(function (em, ind) {
+                    $(this).find("cite").css("display", "");
+                    $(this).find("dl").css("display", "");
+                });
+            } else {
+
+            }
+        });
+        //顶部右侧菜单监控
+        element.on('nav(rightmenu)', function (elem) {
+            var url = $(this).attr("lay-href");
+            if (url != undefined) {
+                layer.open({
+                    title: elem[0].innerText,
+                    type: 2,
+                    content: url,
+                    area: ['600px', '500px']
+                });
+            }
+            if (elem[0].innerText == "锁屏") {
+                layer.open({
+                    title: "已锁屏",
+                    content: '<input name="pass" class="layui-input" type="text" placeholder="请输入密码,默认123123" autocomplete="off"/>',
+                    btnAlign: 'c',
+                    anim: 1,
+                    btn: ['解锁'],
+                    yes: function (index, layero) {
+                        var pass = layero.find('.layui-layer-content input').val();
+                        if (pass == "123123") {
+                            layer.close(index);
+                        } else {
+                            layer.title("密码不正确！", index);
+                        }
+                    },
+                    cancel: function () {
+                        return false //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+            }
+        })
+        //左侧垂直菜单监控
+        element.on('nav(navtree)', function (elem) {
+            if ($(".layui-side-menu").width() < 200) {
+                $(".layui-side-menu").animate({
+                    width: $(".layui-side-menu").width() + 144 + "px"
+                });
+                $(".layui-body").animate({
+                    left: $(".layui-body").position().left + 144 + "px"
+                });
+                $(".layui-footer").animate({
+                    left: $(".layui-footer").position().left + 144 + "px"
+                });
+                $(".layui-layout-left li:first-child").find("a").attr("class", "hidetab");
+                $(".layui-layout-left li:first-child").find("i").attr("class", "layui-icon layui-icon-shrink-right");
+                $(".layui-nav-tree").find("li").each(function (em, ind) {
+                    $(this).find("cite").css("display", "");
+                    $(this).find("dl").css("display", "");
+                });
+            } else {
+                if ($(this).attr("lay-href") != undefined) {
+                    var flag = true;
+                    //url
+                    var url = $(this).attr("lay-href");
+                    //判断选项卡中是否存在已打开的页面，如果有直接切换到打开页面
+                    $(".layui-tab-title li").each(function (i, e) {
+                        if ($(this).attr("lay-id") == url) {
+                            //切换选项卡
+                            element.tabChange('pagetabs', url);
+                            flag = false;
+                        }
+                    })
+                    if (flag) {
+                        //新增选项卡
+                        element.tabAdd('pagetabs', {
+                            title: elem[0].innerText,
+                            content: '<iframe src="' + url + '" class="layui-admin-iframe" scrolling="auto" frameborder="0"  style="width:100%;height:600px;"></iframe>',
+                            id: url
+                        });
+                        FrameWH();
+                        //切换选项卡
+                        element.tabChange('pagetabs', url);
+                    }
+                }
+            }
+        });
+
+        function FrameWH() {
+            var h = $(window).height() - 41 - 10 - 60 - 10 - 44 - 10;
+            $("iframe").css("height", h + "px");
+        }
+
+        $(window).resize(function () {
+            FrameWH();
+        });
+    });
+</script>
+</body>
+
+</html>

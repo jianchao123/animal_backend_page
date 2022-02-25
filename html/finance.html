@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>财务统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-form-select {
+            width: 150px;
+        }
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table class="layui-table" id="userlist" lay-filter="demo">
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.render({ //其它参数在此省略
+            elem: '#userlist',
+            method: "get",
+            url: geturl() + "/statistics/financialsheets/",
+            page: true,
+            cols: [
+                [{
+                    field: 'data_date',
+                    title: '日期',
+                    align: 'left',
+                    rowspan: 2,
+                    width:100
+                }, {field: 'deposit_total_cny',align: 'center', title: '总收入',rowspan: 2,} 
+                , {
+                    field: 'pay_rates',
+                    title: '支付费率',
+                    rowspan: 2,
+                    width:90
+                }, {align: 'center', title: '中奖', colspan: 2} 
+                , {align: 'center', title: '发货', colspan: 3} 
+                , {align: 'center', title: '佣金', colspan: 3} 
+                , {align: 'center', title: '利润', colspan: 3} 
+                ],[
+                	 {
+                    field: 'win_prize_entity_price',
+                    title: '实物'
+	                }, {
+	                    field: 'win_prize_virtual_price',
+	                    title: '虚拟'
+	                }, {
+                    field: 'deliver_goods_entity_price',
+                    title: '实物'
+	                }, {
+	                    field: 'deliver_goods_virtual_price',
+	                    title: '虚拟'
+	                }, {
+	                    field: 'recycle_businessman_withdraw_price',
+	                    title: '卡商提现'
+	                }, {
+                    field: 'recycle_commission',
+                    title: '收货'
+	                }, {
+	                    field: 'ls_commission',
+	                    title: '流水'
+	                }, {
+	                    field: 'dc_commission',
+	                    title: '代充'
+	                }, {
+	                    field: 'll_profit',
+	                    title: '理论'
+	                }, {
+	                    field: 'profit_rate',
+	                    title: '利润率'
+	                }, {
+	                    field: 'real_profit',
+	                    title: '实际'
+	                }
+                ]
+            ],
+            height: 'full-100',
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.detail, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.results //列表
+                };
+            },
+            id: 'userlistReload'
+
+        });
+
+        var $ = layui.$,
+            active = {
+                reload: function () {
+
+                    //执行重载
+                    table.reload('userlistReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                        }
+                    });
+                }
+            };
+
+        $('#userlistTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>用户信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <!--<div class="layui-form layui-card-header layuiadmin-card-header-auto" id="productlistTable">
+                   <div class="layui-inline">
+                    <label class="layui-form-label">状态</label>
+                       <div class="layui-input-block">
+                           <select name="city" lay-verify="" >
+                                                   <option value="-1">全部</option>
+                                                   <option value="1">已上架</option>
+                                                   <option value="0">已下架</option>
+                                               </select>
+                       </div>
+                   </div>
+
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="reload"><i class="layui-icon">&#xe615;</i>查询</button>
+               </div>-->
+
+		  <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <button class="layui-btn layui-btn-normal" data-type="addbusinessman">添加卡商</button>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="productlist" lay-filter="product">
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit" style="background-color:#3D8DB8;color: white;">编辑</a>
+    <!-- <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="password" style="background-color:#EEA03F;color: white;">重置密码</a>-->
+</script>
+<script type="text/html" id="statu">
+    {{#  if(d.is_recycle == 1){ }}
+    <button class='layui-btn layui-btn layui-btn-sm' style='background-color:#4C9D62;'>可收卡</button>
+    {{#  } else  { }}
+    <button class='layui-btn layui-btn layui-btn-sm' style='background-color:#D84C29;'>不可收卡</button>
+    {{#  } }}
+    <br/>
+    <br/>
+    {{#  if(d.is_login == 1){ }}
+    <button class='layui-btn layui-btn layui-btn-sm' style='background-color:#4C9D62;'>可登陆</button>
+    {{#  } else  { }}
+    <button class='layui-btn layui-btn layui-btn-sm' style='background-color:#D84C29;'>不可登陆</button>
+    {{#  } }}
+</script>
+<script type="text/html" id="address">
+    <span>
+		   国家： {{d.country}}
+		
+	</span>
+    <br/>
+    <span>省：
+		    {{d.province}}
+	</span>
+    <br/>
+    <span>市：
+		    {{d.city}}
+	</span>
+</script>
+
+<script type="text/html" id="point">
+    <span>
+		   收卡收货： {{d.recycle_back_rate*100}}%
+		
+	</span>
+    <br/>
+    <span>代充佣金：
+		    {{d.deposit_back_rate*100}}%
+	</span>
+    <br/>
+    <span>邀请用户：
+		    {{d.invite_back_rate*100}}%
+	</span>
+</script>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.render({ //其它参数在此省略
+            elem: '#productlist',
+            method: "get",
+            url: geturl() + "/businessman/recyclebusinessmanlist/",
+            page: true,
+            cols: [[ //标题栏
+                {field: 'uid', title: 'UID', width: 120} //rowspan即纵向跨越的单元格数
+                , {
+                    field: 'userinfo', title: '用户账号', width: 120, templet: function (d) {
+                        return d.username + '[' + d.nickname + ']';
+
+                    }
+                }
+                , {field: 'phone', title: '收卡号', width: 80}
+                , {field: 'invite_code', title: '邀请码', width: 120}
+                , {
+                    field: 'invite_qr_code', title: '邀请二维码', width: 120,
+                    templet: function (d) {
+                        return '<img style="display: inline-block; width: 100%; height: 100%;" src="' + getimgurl() + d.invite_qr_code + '">';
+                    }
+
+                }
+                , {field: 'dh_phone', title: '兑换号', width: 120}
+                , {field: 'address', title: '地佣金点数', width: 200, templet: '#point'}
+                , {field: 'balance_cny', title: '可提取金额', width: 120}
+                , {field: 'status', title: '状态', width: 120, templet: '#statu'}
+                , {field: 'create_time', title: '创建时间', width: 120}
+                , {field: 'amount', title: '操作', toolbar: '#barDemo', width: 80}
+            ]],
+            height: 'full-100',
+            parseData: function (res) { //res 即为原始返回的数据
+                console.log(res);
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.detail, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.results //解析数据列表
+                };
+            }
+            , id: 'userlistReload'
+
+        });
+
+
+        //监听工具条
+        table.on('tool(product)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                //页面层
+                layer.open({
+                    type: 2,
+                    title: "修改用户信息",
+                    skin: 'layui-layer-rim', //加上边框
+                    shadeClose: true,
+                    area: ['400px', '450px'], //宽高
+                    content: "updateUser.html?id=" + data.pk + "&phone=" + data.phone
+                });
+            } else if (obj.event === 'password') {
+                layer.open({
+                    type: 2,
+                    title: "修改密码",
+                    skin: 'layui-layer-rim', //加上边框
+                    shadeClose: true,
+                    area: ['400px', '400px'], //宽高
+                    content: "changepassword.html"
+
+                });
+
+            }
+        });
+
+        var $ = layui.$, active = {
+            reload: function () {
+                var userPhone = $('#userPhone').val();
+
+                //执行重载
+                table.reload('userlistReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        phone: userPhone
+                    }
+                });
+            },addbusinessman: function () {
+                    layer.open({
+                        type: 2,
+                        title: "添加卡商",
+                        skin: 'layui-layer-rim', //加上边框
+                        shadeClose: true,
+                        maxmin: true, //开启最大化最小化按钮
+                        area: ['400px', '450px'], //宽高
+                        content: "addbusinessman.html"
+                    });
+
+                }
+        };
+
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+</html>

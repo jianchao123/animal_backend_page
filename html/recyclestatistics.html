@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>卡商收卡统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layui-fluid">
+    <h1>收卡统计</h1>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table class="layui-table" id="userlist" lay-filter="demo">
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+<script>
+    layui.use('form', function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+    });    //数据绑定
+    var result = sendRequest("get", "/businessman/recyclestatistics/", {});
+    var len = 1;
+    var totalday = 0;
+    if (result.code === 0) {
+        len += result.data.date_list.length;
+        totalday = result.data.date_list.length;
+    }
+    //设置表头
+    var cols = new Array();
+    for (var i = 0; i < 1; i++) {
+        cols[i] = new Array();
+        for (var j = 0; j < len; j++) {
+            if (j == 0) {
+                cols[i][j] = {
+                    field: 'nickname',
+                    title: '卡商',
+                    width: 180,
+                    templet: function (d) {
+
+                        return "<a style='color: #34C0E3' onclick='detail(" + d.pk + ")' >" + d.nickname + "</a>";
+                    }
+
+                };
+            } else {
+                //设置日期表头
+                var k = 0;
+                cols[i][j] = {
+                    field: 'dateinfo',
+                    title: result.data.date_list[j - 1],
+                    width: 120,
+                    templet: function (d) {
+                        //设置表头里绑定的数据
+                        var dateinfo = result.data.data[d.LAY_INDEX - 1]; //获取当前行数据
+                        var col = 0; //第几列
+                        if (k < totalday) {
+                            col = k;
+                        } else if (k >= totalday) {
+                            col = k % totalday;
+                        }
+                        var str = "";
+                        if (dateinfo.data[col] != undefined && dateinfo.data[col] != null) {
+                            str = dateinfo.data[col];
+                        } else {
+                            str = "";
+
+                        }
+                        k++;
+                        return str;
+
+                    }
+                };
+            }
+        }
+
+    }
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.render({ //其它参数在此省略
+            elem: '#userlist',
+            method: "get",
+            url: geturl() + "/businessman/recyclestatistics/",
+            cols: cols,
+            height: 'full-100',
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.detail, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.data //解析数据列表
+                };
+            },
+            id: 'userlistReload'
+
+        });
+
+        var $ = layui.$,
+            active = {
+                reload: function () {
+                    var condition = $('#condition').val();
+                    var query_date = $('#query_date').val();
+
+                    //执行重载
+                    table.reload('userlistReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                            condition: condition,
+                            query_date: query_date
+                        }
+                    });
+                }
+            };
+
+        $('#userlistTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+
+    function detail(pk) {
+        //页面层
+        layer.open({
+            type: 2,
+            title: "回收商每日收货金额",
+            skin: 'layui-layer-rim', //加上边框
+            shadeClose: true,
+            maxmin: true, //开启最大化最小化按钮
+            area: ['400px', '400px'], //宽高
+            content: "everydayrecycleprice.html?id=" + pk,  //调到新增页面
+
+        });
+
+    }
+</script>
+
+</body>
+
+</html>

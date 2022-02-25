@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>卡商收卡记录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-form-select {
+            width: 150px;
+        }
+
+        .layui-table-cell {
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table class="layui-table" id="userlist" lay-filter="demo">
+
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+
+<script type="text/html" id="recycle_period_no">
+    <span>
+		    第{{d.recycle_period_no}}期
+		</span>
+</script>
+
+
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.render({ //其它参数在此省略
+            elem: '#userlist',
+            method: "get",
+            url: geturl() + "/businessman/recyclerecordlist/",
+            page: true,
+            cols: [
+                [{
+                    field: 'recycle_trade_no',
+                    title: '入库订单号',
+                    width: 300
+                }, {
+                    field: 'recycle_businessman_nickname',
+                    title: '卡商',
+                    width: 200,
+                    templet: function (d) {
+
+                        return "<span style='color: #34C0E3'>" + d.recycle_businessman_nickname + "</span>";
+                    }
+                }, {
+                    field: 'recycle_period_no',
+                    title: '期数',
+                    width: 200,
+                    templet: '#recycle_period_no'
+                }, {
+                    field: 'commodity_name',
+                    title: '商品信息',
+                    width: 200
+                }, {
+                    field: 'recycle_price',
+                    title: '商品价格',
+                    width: 120
+                }, {
+                    field: 'phone',
+                    title: '号码',
+                    width: 120
+                },  {
+                    field: 'luck_player_nickname',
+                    title: '中奖者',
+                    width: 120
+                }, {
+                    field: 'recycle_time',
+                    title: '入库时间',
+                    width: 160
+                }
+
+                ]
+            ],
+            height: 'full-100',
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.detail, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.data //列表
+                };
+            },
+            id: 'userlistReload'
+
+        });
+
+        var $ = layui.$,
+            active = {
+                reload: function () {
+                    var uid = $('#uid').val();
+                    var phone = $('#phone').val();
+                    var period_no = $('#period_no').val();
+
+                    //执行重载
+                    table.reload('userlistReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                            uid: uid,
+                            phone: phone,
+                            period_no: period_no
+                        }
+                    });
+                }
+            };
+
+        $('#userlistTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

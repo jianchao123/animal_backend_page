@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>商品</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style>
+        .layui-inline, img {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<input type="hidden" name="uptoken_url" id="uptoken_url" value="1">
+<form class="layui-form layui-form-pane" action="" lay-filter="productType">
+    <input type="hidden" id="id">
+    <input type="hidden" id="image_path">
+    <!--<div class="layui-form-item">-->
+        <!--<label class="layui-form-label"style="color: red">注意：</label>-->
+        <!--<div class="layui-input-inline" style="width: 64%;line-height: 40px;margin-left: 3px;">-->
+            <!--<span style="color: red">单价 总人次 开奖类型 市场价 兑换价 夺宝价 不能更改！</span>-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品排序</label>
+        <div class="layui-input-inline">
+            <input type="text" id="show_index" name="show_index" lay-verify="required" placeholder="请输入商品排序" autocomplete="off"
+                   class="layui-input"
+                   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品名字</label>
+        <div class="layui-input-inline">
+            <input type="text" id="commodity_name" name="commodity_name" lay-verify="required" placeholder="请输入商品名字"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品类型</label>
+        <div class="layui-input-inline">
+            <select  id="commodity_type"  name="commodity_type" lay-verify="" style="width: 100px;">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">开奖类型</label>
+        <div class="layui-input-block" id="reward_type" >
+            <input type="radio" name="reward_type" id="reward_a" value="1" title="秒开" checked="">
+            <input type="radio" name="reward_type"  id="reward_b" value="2" title="B值">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">市场价</label>
+        <div class="layui-input-inline">
+            <input  type="text" id="market_price_cny" name="market_price_cny" lay-verify="required" placeholder="请输入市场价"
+                   autocomplete="off" class="layui-input"
+                   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">夺宝价</label>
+        <div class="layui-input-inline">
+            <input   type="text" id="snatch_treasure_amounts" name="snatch_treasure_amounts" lay-verify="required"
+                   placeholder="请输入夺宝价" autocomplete="off" class="layui-input"
+                   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">兑换价</label>
+        <div class="layui-input-inline">
+            <input  type="text" id="dh_price_cny" name="dh_price_cny" lay-verify="required" placeholder="请输入兑换价"
+                   autocomplete="off" class="layui-input"
+                   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+        </div>
+    </div>
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">是否续期</label>
+        <div class="layui-input-block" id="is_continue">
+            <input type="radio" name="is_continue" value="1"  title="是" checked="">
+            <input type="radio" name="is_continue" value="0"  title="否">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">进货渠道</label>
+        <div class="layui-input-inline">
+            <select id="buy_channel" name="buy_channel" lay-verify="" style="width: 100px;">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">定额串</label>
+        <div class="layui-input-inline">
+            <input  type="text" id="quota_str" name="quota_str" lay-verify="required" placeholder="请输入定额串(逗号分割) 例: 200,300,400,"
+                    autocomplete="off" class="layui-input" style="width: 300px;">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">单价</label>
+        <div class="layui-input-inline">
+            <input  type="text" id="unit_price" name="unit_price" lay-verify="required" placeholder="请输入单价"
+                    autocomplete="off" class="layui-input" style="width: 300px;">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">总人次</label>
+        <div class="layui-input-inline">
+            <input  type="text" id="total_renci" name="total_renci" lay-verify="required" placeholder="请输入人次"
+                    autocomplete="off" class="layui-input" style="width: 300px;">
+        </div>
+    </div>
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block" id="status">
+            <input type="radio" name="status" value="1" title="上架" checked="">
+            <input type="radio" name="status" value="2" title="下架">
+        </div>
+    </div>
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">是否卡密</label>
+        <div class="layui-input-block" id="is_card">
+            <input type="radio"  name="is_card"  id='is_card_a' value="1" title="是" checked="">
+            <input type="radio"  name="is_card" id='is_card_b' value="0" title="否">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">卡密种类</label>
+        <div class="layui-input-inline">
+            <select  id="card_inventory" name="card_inventory" lay-verify="" style="width: 100px;">
+            </select>
+        </div>
+    </div>
+
+    <!--<div class="layui-form-item" id="container">
+        <button type="button" class="layui-btn" id="test">选择商品图片</button>
+        <button type="button" class="layui-btn layui-hide" id="test1">上传</button>
+    </div>
+    <div class="layui-upload-list" style="width: 200px;height:200px">
+        <img class="layui-upload-img" id="demo1">
+        <div class="layui-progress layui-progress-big layui-hide" lay-filter="pb" id="jd" lay-showPercent="true">
+            <div class="layui-progress-bar" lay-percent="0%"></div>
+            <p id="demoText"></p>
+        </div>
+    </div>-->
+     <div class="layui-form-item">
+        <label class="layui-form-label">商品图片上传</label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" id="more_img_put">
+                <i class="layui-icon">&#xe67c;</i>选择图片（预览顺序则是展示顺序）
+            </button>
+            <button type="button" class="layui-btn" id="start_upload">开始上传</button>
+            <button type="button" class="layui-btn" id="cleanImgs"> <i class="fa fa-trash-o fa-lg"></i>清空图片预览</button>
+        </div>
+        <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+            预览图：
+            <div class="layui-upload-list" id="preview_btn"></div>
+        </blockquote>
+	</div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="demo2" id="opt">添加</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/plupload.full.min.js"></script>
+<script src="js/qiniu.min.js"></script>
+<script src="js/tools.js"></script>
+<script>
+    var type = getUrlParam('type');
+    if(type==1){
+        document.getElementById('reward_a').setAttribute('disabled', 'disabled');
+        document.getElementById('reward_b').setAttribute('disabled', 'disabled');
+        document.getElementById('market_price_cny').setAttribute('disabled', 'disabled');
+        document.getElementById('market_price_cny').style.color='#d0cbcb';
+        document.getElementById('snatch_treasure_amounts').setAttribute('disabled', 'disabled');
+        document.getElementById('snatch_treasure_amounts').style.color='#d0cbcb';
+        document.getElementById('dh_price_cny').setAttribute('disabled', 'disabled');
+        document.getElementById('dh_price_cny').style.color='#d0cbcb';
+        document.getElementById('unit_price').setAttribute('disabled', 'disabled');
+        document.getElementById('unit_price').style.color='#d0cbcb';
+        document.getElementById('total_renci').setAttribute('disabled', 'disabled');
+        document.getElementById('total_renci').style.color='#d0cbcb';
+        document.getElementById('is_card_a').setAttribute('disabled', 'disabled');
+        document.getElementById('is_card_b').setAttribute('disabled', 'disabled');
+        document.getElementById('card_inventory').setAttribute('disabled', 'disabled');
+
+    }
+    //商品类型
+    var commodity_types = sendRequest("get", "/settings/commoditytypes/", {}).data.results;
+    var commodity_typeshtml = "";
+    for (var i = 0; i < commodity_types.length; i++) {
+        commodity_typeshtml += '<option value = "' + commodity_types[i].pk + '">' + commodity_types[i].type_name + '</option>';
+    }
+    $("#commodity_type").html(commodity_typeshtml);
+
+    //进货渠道
+    var buy_channels = sendRequest("get", "/settings/buychannels/", {}).data.results;
+    var buy_channelshtml = "";
+    for (var i = 0; i < buy_channels.length; i++) {
+        buy_channelshtml += '<option value = "' + buy_channels[i].pk + '">' + buy_channels[i].remark + '</option>';
+    }
+    $("#buy_channel").html(buy_channelshtml);
+
+    //卡密种类
+    var card_inventorys = sendRequest("get", "/inventory/cardinventories/", {}).data;
+    var card_inventoryshtml = "";
+    for (var i = 0; i < card_inventorys.length; i++) {
+        card_inventoryshtml += '<option value = "' + card_inventorys[i].pk + '">' + card_inventorys[i].name + '</option>';
+    }
+    $("#card_inventory").html(card_inventoryshtml);
+
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]);
+        return null; //返回参数值
+    }
+
+    var timestamp = (new Date()).getTime();
+
+    function getTokenMessage(name) {
+        var name = "commodity/" + timestamp + name;
+        var result = sendRequest("get", "/user/getqiniutoken/", {
+            upload_file_name: name
+        });
+        return result.data.upload_token;
+    }
+
+  /*document.getElementById('test1').onclick = function () {
+      uploader.start();
+  };*/
+
+var success=0;
+	var fail=0;
+	var imgurls="";
+    let list=[];
+    let isedit=false;
+    $(function (){
+		var imgsName="";
+		layui.use(['upload','layer'],function() {
+			var upload = layui.upload;
+			var layer=layui.layer;
+	 		 var account = sessionStorage.getItem("account");
+            var data = JSON.parse(account);
+			upload.render({
+				elem: '#more_img_put',
+				url: geturl() + "/snatchtreasure/upload/",
+				multiple: true,
+				auto:false,
+				size:10240,
+				number:3,
+				field:'file',
+				bindAction: '#start_upload',
+				before: function(obj) {
+					obj.preview(function(index, file, result) {
+						$('#preview_btn').append('<img src="' + result 
+							+ '" alt="' + file.name 
+							+'"height="92px" width="92px" class="layui-upload-img uploadImgPreView">')
+					});
+				},
+				done: function(res, index, upload) {
+					if(res.code != 0){
+						fail++;
+					}else{
+						success++;
+						// let ip='http://img-shopping-test.xhty.site/';//测试图片地址
+                        let ip='http://image-pro.shalilai.cn/';//正式图片地址
+						list.push(ip+res.data.path);
+						imgurls=list.join(',');
+                        isedit=true;
+
+					}
+				},
+				allDone:function(obj){
+				    layer.msg("总共要上传图片总数为："+(fail+success)+"\n"
+				    			+"其中上传成功图片数为："+success+"\n"
+				    			+"其中上传失败图片数为："+fail
+				    		 )
+				}
+			});
+	 
+		});
+		
+		cleanImgsPreview();
+		//goodsSave();
+	});
+	 
+
+	function cleanImgsPreview(){
+		$("#cleanImgs").click(function(){
+			success=0;
+			fail=0;
+			$('#preview_btn').html("");
+            $("#image_path").val(null);
+		});
+	}
+
+
+    layui.use(['form', 'element'], function () {
+        var form = layui.form
+            , layer = layui.layer, element = layui.element;
+
+        var tokenurl = $("#uptoken_url").val();
+        //引入Plupload 、qiniu.js后
+       /* uploader = Qiniu.uploader({
+            runtimes: 'html5,flash,html4', //上传模式,依次退化
+            browse_button: 'test', //上传选择的点选按钮，**必需**
+            uptoken: tokenurl,
+            // uptoken_url: getToken(), //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）
+            // uptoken : '', //若未指定uptoken_url,则必须指定 uptoken ,uptoken由其他程序生成
+            // unique_names: true, // 默认 false，key为文件名。若开启该选项，SDK为自动生成上传成功后的key（文件名）。
+            // save_key: true, // 默认 false。若在服务端生成uptoken的上传策略中指定了 `sava_key`，则开启，SDK会忽略对key的处理
+            filters: {
+                mime_types: [ //只允许上传图片
+                    {
+                        title: "Image files",
+                        extensions: "jpg,jpeg,gif,png"
+                    },
+                ],
+                prevent_duplicates: false //不允许选取重复文件
+            },
+            domain: 'http://imgshopping.strongbug.com', //bucket 域名，下载资源时用到，**必需**
+            get_new_uptoken: false, //设置上传文件的时候是否每次都重新获取新的token
+            container: 'container', //上传区域DOM ID，默认是browser_button的父元素，
+            max_file_size: '100mb', //最大文件体积限制
+            flash_swf_url: 'Moxie.swf', //引入flash,相对路径
+            max_retries: 3, //上传失败最大重试次数
+            dragdrop: false, //开启可拖曳上传
+            drop_element: 'container', //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
+            chunk_size: '4mb', //分块上传时，每片的体积
+            auto_start: false, //选择文件后自动上传，若关闭需要自己绑定事件触发上传
+            init: {
+                'FilesAdded': function (up, files) {
+                    var name = files[0].name;
+                    var token = getTokenMessage(name);
+                    $("#uptoken_url").val(token);
+                    tokenurl = token;
+                    // 设置预览图地址
+                    var img = new o.Image();
+                    img.onload = function () {
+                        $("#demo1").attr('src', this.getAsDataURL());
+                    }
+                    img.load(files[0].getSource());
+                    // 开始上传按钮
+                    plupload.each(files, function (file) {
+                        // 如果上传文件大于1 ps：第一个文件上传的时候用户选择第二个文件
+                        // 这时队列大于1，队列的第一个文件是正在上传的，第二个是新选的
+                        if (up.files.length > 1) {
+                            // 移除当前队列里第一个文件
+                            up.removeFile(up.files[0]);
+                        }
+                        // 全局变量 根据变量控制不让表单提前提交
+                        imgloading = true;
+                        // 文件添加进队列后,处理相关的事情
+                    });
+                    element.progress('pb', "0%");
+                    document.getElementById("test1").setAttribute("class", "layui-btn layui-show");
+
+                },
+                'BeforeUpload': function (up, file) {
+                    // 每个文件上传前,处理相关的事情
+                    var token = $("#uptoken_url").val();
+                    uploader.settings.uptoken = token;
+                    uploader.settings.multipart_params.token = token;
+                },
+                'UploadProgress': function (up, file) {
+                    document.getElementById("jd").setAttribute("class", "layui-progress layui-progress-big layui-show");
+                    // 每个文件上传时,处理相关的事情
+                    element.progress('pb', file.percent + "%");
+
+                },
+                'FileUploaded': function (up, file, info) {
+
+                    // 每个文件上传成功后,处理相关的事情
+                    // 其中 info 是文件上传成功后，服务端返回的json，形式如
+                    // {
+                    // "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
+                    // "key": "gogopher.jpg"
+                    // }
+                    // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
+
+                    //  var domain = up.getOption('domain');
+                    // var res =  $.parseJSON(info);
+                    //  var sourceLink = domain + res.key; //获取上传成功后的文件的Url
+                    //  $('#demo1').attr('src', sourceLink);
+                    document.getElementById("test1").setAttribute("class", "layui-btn layui-hide");
+                    document.getElementById("jd").setAttribute("class", "layui-progress layui-progress-big layui-hide");
+                    //image_path
+                    var res = $.parseJSON(info);
+                    $("#image_path").val(res.key);
+                    console.log(res.key);
+                },
+                'Error': function (up, err, errTip) {
+                    //上传出错时,处理相关的事情
+                    element.progress('pb', "0%");
+                    layer.msg('上传失败!');
+                },
+                'UploadComplete': function () {
+                    //队列文件处理完毕后,处理相关的事情
+                },
+                'Key': function (up, file) {
+                    // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
+                    // 该配置必须要在 unique_names: false , save_key: false 时才生效
+
+                    var fileName = file.name;
+                    var key = "commodity/" + timestamp + fileName;
+                    return key
+                }
+            }
+        });*/
+
+
+        //监听提交
+        form.on('submit(demo2)', function (data) {
+            var list_path = $("#image_path").val();
+            if(isedit){
+                if(list_path.length>0){
+                    $("#image_path").val(list_path+','+imgurls);
+                }else {
+                    $("#image_path").val(imgurls);
+                }
+            }else {
+                $("#image_path").val(list_path);
+            }
+            if (type == 0) {
+                var image_path = $("#image_path").val();
+                if (image_path == null || image_path == '' || image_path == undefined) {
+                    layer.msg('图片未上传!');
+                } else {
+                    var commodity_name = $("#commodity_name").val();
+                    var commodity_type = parseInt($("#commodity_type").val());
+                    var reward_type = parseInt($('#reward_type input[name="reward_type"]:checked ').val());
+                    var market_price_cny = parseFloat($("#market_price_cny").val()).toFixed(4);
+                    var snatch_treasure_amounts = parseInt($("#snatch_treasure_amounts").val());
+                    var dh_price_cny = parseFloat($("#dh_price_cny").val()).toFixed(4);
+                    var is_continue = parseInt($('#is_continue input[name="is_continue"]:checked ').val());
+                    var buy_channel = parseInt($("#buy_channel").val());
+                    var status = parseInt($('#status input[name="status"]:checked ').val());
+                    var is_card = parseInt($('#is_card input[name="is_card"]:checked ').val());
+                    var card_inventory = parseInt($("#card_inventory").val());
+                    var show_index = parseInt($("#show_index").val());
+                    var quota_str = $("#quota_str").val();
+                    var unit_price = parseInt($("#unit_price").val());
+                    var total_renci = parseInt($("#total_renci").val());
+                    var param = {
+                        image_path:image_path,
+                        commodity_name: commodity_name,
+                        commodity_type: commodity_type,
+                        reward_type: reward_type,
+                        market_price_cny: market_price_cny,
+                        snatch_treasure_amounts: snatch_treasure_amounts,
+                        dh_price_cny: dh_price_cny,
+                        is_continue: is_continue,
+                        buy_channel: buy_channel,
+                        status: status,
+                        is_card: is_card,
+                        card_inventory: card_inventory,
+                        show_index:show_index,
+                        total_renci:total_renci,
+                        quota_str:quota_str,
+                        unit_price:unit_price
+
+                    };
+                    var result = sendRequest("post", "/snatchtreasure/commoditys/", JSON.stringify(param));
+                     if(result.code === 0){
+        				layer.msg('操作成功！', {icon: 1,time:1000},function(){
+		                    window.parent.location.reload();
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.close(index); //关闭弹层的窗口
+						});
+        			}
+                }
+            } else if (type == 1) {
+                var image_path = $("#image_path").val();
+                var commodity_name = $("#commodity_name").val();
+                var commodity_type = parseInt($("#commodity_type").val());
+                var reward_type = parseInt($('#reward_type input[name="reward_type"]:checked ').val());
+                var market_price_cny = parseFloat($("#market_price_cny").val()).toFixed(4);
+                var snatch_treasure_amounts = parseInt($("#snatch_treasure_amounts").val());
+                var dh_price_cny = parseFloat($("#dh_price_cny").val()).toFixed(4);
+                var is_continue = parseInt($('#is_continue input[name="is_continue"]:checked ').val());
+                var buy_channel = parseInt($("#buy_channel").val());
+                var status = parseInt($('#status input[name="status"]:checked ').val());
+                var is_card = parseInt($('#is_card input[name="is_card"]:checked ').val());
+                var card_inventory = parseInt($("#card_inventory").val());
+                var quota_str = $("#quota_str").val();
+                var unit_price = parseInt($("#unit_price").val());
+                var total_renci = parseInt($("#total_renci").val());
+                var param = {};
+                if($("#show_index").val() != null && $("#show_index").val() != undefined){
+                    var show_index = parseInt($("#show_index").val());
+                    param =  {
+                        pk:parseInt($("#id").val()),
+                        image_path: image_path,
+                        is_continue: is_continue,
+                        buy_channel: buy_channel,
+                        status: status,
+                        show_index:show_index,
+                        commodity_name: commodity_name,
+                        commodity_type: commodity_type,
+                        reward_type: reward_type,
+                        market_price_cny: market_price_cny,
+                        snatch_treasure_amounts: snatch_treasure_amounts,
+                        dh_price_cny: dh_price_cny,
+                        is_card: is_card,
+                        card_inventory: card_inventory,
+                        quota_str:quota_str,
+                        unit_price:unit_price,
+                        total_renci:total_renci
+                    };
+
+                }else {
+                    param =  {
+                        pk:parseInt($("#id").val()),
+                        image_path: image_path,
+                        is_continue: is_continue,
+                        buy_channel: buy_channel,
+                        status: status,
+                        commodity_name: commodity_name,
+                        commodity_type: commodity_type,
+                        reward_type: reward_type,
+                        market_price_cny: market_price_cny,
+                        snatch_treasure_amounts: snatch_treasure_amounts,
+                        dh_price_cny: dh_price_cny,
+                        is_card: is_card,
+                        card_inventory: card_inventory,
+                        quota_str:quota_str,
+                        unit_price:unit_price,
+                        total_renci:total_renci
+                    };
+                }
+                var result = sendRequest("put", "/snatchtreasure/commodity/" + $("#id").val() + "/", JSON.stringify(param));
+                 if(result.code === 0){
+        				layer.msg('操作成功！', {icon: 1,time:1000},function(){
+		                    window.parent.location.reload();
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.close(index); //关闭弹层的窗口
+						});
+        			}
+            }
+            return false;
+        });
+
+        if (type == 1) {
+//          document.getElementById("commodity_name").setAttribute("disabled", "disabled");
+//          document.getElementById("commodity_type").setAttribute("disabled", "disabled");
+//          document.getElementById("market_price_cny").setAttribute("disabled", "disabled");
+//          document.getElementById("snatch_treasure_amounts").setAttribute("disabled", "disabled");
+//          document.getElementById("dh_price_cny").setAttribute("disabled", "disabled");
+//          document.getElementById("commodity_name").setAttribute("disabled", "disabled");
+            var inputs =document.getElementsByName("is_card");
+            for(var i=0;i<inputs.length;i++){
+                var input=inputs[i];
+                //input.setAttribute("disabled", "disabled");
+            }
+            var reward_types =document.getElementsByName("reward_type");
+            for(var i=0;i<reward_types.length;i++){
+                var rewardtypes=reward_types[i];
+               // rewardtypes.setAttribute("disabled", "disabled");
+            }
+            //document.getElementById("card_inventory").setAttribute("disabled", "disabled");
+            var product = localStorage.getItem("product");
+            var data = JSON.parse(product);
+            $("#id").val(data.pk);
+            $("#image_path").val(data.commodity_images);
+            var str ="";
+           var ius = data.commodity_images.split(",");
+                    	for (var i = 0; i < ius.length; i++) {
+                    		if(ius[i] != null && ius[i] != ""){
+                    			str += '<img src="' + ius[i]
+							+ '" height="92px" width="92px" class="layui-upload-img uploadImgPreView">';
+                    		}
+                    	}
+            $('#preview_btn').append(str);
+            $("input[name=reward_type][value='" + data.reward_type + "']").prop("checked", "checked");
+            $("input[name=is_continue][value='" + data.is_continue + "']").prop("checked", "checked");
+            $("input[name=status][value='" + data.status + "']").prop("checked", "checked");
+            if( data.is_card == true){
+                $("input[name=is_card][value='1']").prop("checked", "checked");
+            }else{
+                $("input[name=is_card][value='0']").prop("checked", "checked");
+            }
+            //表单初始赋值
+            form.val('productType', {
+                "commodity_name": data.commodity_name // "name": "value"
+                , "commodity_type": data.commodity_type
+                , "market_price_cny": data.market_price_cny
+                , "snatch_treasure_amounts": data.snatch_treasure_amounts
+                , "dh_price_cny": data.dh_price_cny
+                , "buy_channel": data.buy_channel
+                , "image_path": data.commodity_images
+                , "card_inventory": data.card_inventory
+                ,"show_index":data.show_index
+                ,"quota_str":data.quota_str
+                ,"unit_price":data.unit_price
+                ,"total_renci":data.total_renci
+            })
+            document.getElementById("opt").innerHTML = "修改";
+
+        }
+
+
+    });
+</script>
+</body>
+</html>

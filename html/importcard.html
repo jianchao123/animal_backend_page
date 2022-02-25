@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>导入卡密</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui-v2.4.3/layui/css/layui.css">
+    <style type="text/css">
+        .file {
+            position: relative;
+            display: inline-block;
+            background: #D0EEFF;
+            border: 1px solid #99D3F5;
+            border-radius: 4px;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #1E88C7;
+            text-decoration: none;
+            text-indent: 0;
+            line-height: 20px;
+        }
+        .fileup {
+            background: #D0EEFF;
+            border: 1px solid #99D3F5;
+            border-radius: 4px;
+            width: 60px;
+            height: 31.6px;
+            overflow: hidden;
+            color: #1E88C7;
+            vertical-align: middle;
+            margin-bottom: 23px;
+        }
+        .file input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        .file:hover {
+            background: #AADFFD;
+            border-color: #78C3F3;
+            color: #004974;
+            text-decoration: none;
+        }
+        .layui-form-item {
+            margin-bottom: 15px;
+            clear: both;
+            margin-left: 15px;
+        }
+    </style>
+
+</head>
+
+<body>
+<form class="layui-form layui-form-pane" action="" lay-filter="buychannels">
+    <span><font color='red'>注意：上传文件前，请选择好卡密种类，不要选错哦！！！</font></span>
+    <div class="layui-form-item">
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">卡密种类</label>
+        <div class="layui-input-inline">
+            <select id="card_inventory_pk" name="card_inventory_pk" lay-verify="">
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+
+        <a href="javascript:;" class="file">选择文件
+            <i class="layui-icon">&#xe67c;</i><input type="file" onChange="c(this)" name="file" id="file_upload">
+        </a>
+
+        <input type="button"class="fileup" id="up" value="上传" onclick="FileUpload()">
+
+    </div>
+
+    <div class="layui-form-item">
+        <span id="s"></span>
+    </div>
+</form>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src="layui-v2.4.3/layui/layui.js"></script>
+<script src="js/tools.js"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+    });
+    var result = sendRequest("get", "/inventory/cardinventories/", {});
+    var resultData = result.data;
+    var htmls = "";
+    for (var i = 0; i < resultData.length; i++) {
+        htmls += '<option value = "' + resultData[i].pk + '">' + resultData[i].name + '</option>';
+    }
+    $("#card_inventory_pk").html(htmls);
+    function c(th){
+        var inf = document.getElementById('s');
+        var fN = '';
+        //判断并获取文件名
+        if(fN = th.value.match(/[^\\\/]+\.[a-zA-Z0-9]+$/)){
+            //如果获取到文件名，则将文件名在后面的span标签中显示出来。
+            //这里你可以自行修改要显示的样式等。
+            inf.innerHTML = "<font color='green' style='width: 200px'>√ "+fN+"</font>";
+        }else{
+            inf.innerHTML = "<font color='red'>× 获取文件名失败</font>";
+        }
+
+    }
+    function FileUpload() {
+        var form_data = new FormData();
+        var file_info = $('#file_upload')[0].files[0];
+        console.log(file_info);
+        var card_inventory_pk = parseInt($('#card_inventory_pk').val());
+        var file = file_info;
+        if (file == null || file == "") {
+            layer.msg('请选择要上传的Excel文件！', {icon: 5, time: 5000});
+            return false;
+        }
+        var AllImgExt = ".xlsx";
+        var extName = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();//（把路径中的所有字母全部转换为小写）
+        if (AllImgExt.indexOf(extName) == -1) {
+            ErrMsg = "该文件类型不允许上传。请上传 " + AllImgExt + " 类型的文件，当前文件类型为" + extName;
+            layer.msg(ErrMsg, {icon: 5, time: 5000});
+            return false;
+        }
+
+
+        form_data.append('file', file_info);
+        form_data.append('card_inventory_pk', card_inventory_pk);
+        $.ajax({
+            url: geturl() + '/inventory/importcard/',
+            type: 'POST',
+            data: form_data,
+            processData: false,
+            contentType: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            success: function (callback) {
+                if (callback.code === 0) {
+                    layer.msg('导入卡密成功！', {icon: 1, time: 5000});
+                } else {
+                    layer.msg('导入卡密失败！', {icon: 5, time: 5000});
+                }
+            },error: function () {
+                layer.msg('导入卡密失败！', {icon: 5, time: 5000});
+            }
+        });
+
+    }
+</script>
+</body>
+
+</html>
