@@ -1,7 +1,7 @@
 ﻿
 function sendRequest(type,action_name,_data) {
     var ret;
-	var urlPrx = "https://shalilai.cn"+action_name;//正式服务器
+	var urlPrx = "http://139.196.113.98:8080"+action_name;//正式服务器
 	// var urlPrx = "http://animal.xhty.site"+action_name;//测试服务器
 	// var urlPrx = "http://www.shalilai.cn"+action_name;
 	// var urlPrx = "https://47.106.227.96"+action_name;//测试服务器
@@ -50,12 +50,12 @@ function sendRequest(type,action_name,_data) {
 function geturl(){
 	// return  "http://animal.xhty.site";//测试服务器
 	// return "https://47.106.227.96";//测试服务器
-	return "https://shalilai.cn";//正式服务器
+	return "http://139.196.113.98:8080";//正式服务器
 }
 //图片地址
 function getimgurl(){
     // return "http://shopping.strongbug.com/";
-	return "http://image-pro.shalilai.cn";//七牛云正式地址
+	return "http://r7ygktdfd.hb-bkt.clouddn.com";//七牛云正式地址
 	// return "http://img-shopping-test.xhty.site/";//七牛云测试地址
 }
 
